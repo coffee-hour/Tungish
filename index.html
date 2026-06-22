@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233b82f6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M4 19.5A2.5 2.5 0 0 1 6.5 17H20%22></path><path d=%22M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z%22></path></svg>">
-  <title>Tunginised English Dictionary & Translator</title>
+  <title>Tunginised English Dictionary</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-default-dark">
@@ -25,12 +25,11 @@
     <div class="header-area">
       <svg class="main-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
       <h1>Tunginised</h1>
-      <p class="subtitle">English Dictionary & Translator</p>
+      <p class="subtitle">English Dictionary</p>
     </div>
 
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('dictionary')">Search</button>
-      <button class="tab-btn" onclick="switchTab('translator')">Translate</button>
       <button class="tab-btn" onclick="switchTab('tngshsh')">TngShsh</button>
       <button class="tab-btn" onclick="switchTab('games')">Games</button>
       <button class="tab-btn" onclick="switchTab('explorer')">Explorer</button>
@@ -55,20 +54,6 @@
       </div>
       <div id="results">
         <p class="loading-text">Loading live data...</p>
-      </div>
-    </div>
-
-    <div id="translatorTab" class="tab-content">
-      <div class="section-title">Sentence Translator</div>
-      <div class="translator-wrapper">
-        <textarea id="sentenceInput" placeholder="Type a full English sentence to translate..." oninput="translateSentence()"></textarea>
-        <div id="translatorOutputWrapper" class="translator-output-wrapper">
-          <div id="translatedSentence" class="translated-text">Waiting for input...</div>
-          <div class="translator-actions">
-            <button onclick="copyToClipboard('translatedSentence')" class="action-btn">Copy</button>
-            <button onclick="copyShareLink()" class="action-btn">Share Link</button>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -218,14 +203,6 @@
         document.getElementById('results').innerHTML = '<p class="ready-text">Dictionary loaded!</p>';
         updateStats();
         newQuizCard();
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const sharedText = urlParams.get('t');
-        if (sharedText) {
-          switchTab('translator');
-          document.getElementById('sentenceInput').value = sharedText;
-          translateSentence();
-        }
       })
       .catch(error => {
         document.getElementById('results').innerHTML = '<p style="color:red; text-align:center;">Error loading dictionary.</p>';
@@ -332,26 +309,6 @@
       board.appendChild(guessRow);
     }
 
-    function tunginiseWord(word) {
-      const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
-      if (!cleanWord) return word;
-      if (dictMap.has(cleanWord)) return dictMap.get(cleanWord);
-      let compressed = word.replace(/[aeiouAEIOU]/g, '');
-      if (compressed.toLowerCase().startsWith('sa')) compressed = compressed.substring(2);
-      return compressed || word;
-    }
-
-    function translateSentence() {
-      const input = document.getElementById('sentenceInput').value;
-      if (!input.trim()) {
-        document.getElementById('translatedSentence').innerText = "Waiting for input...";
-        return;
-      }
-      const words = input.split(/\s+/);
-      const result = words.map(word => tunginiseWord(word)).join(' ');
-      document.getElementById('translatedSentence').innerText = result;
-    }
-
     // --- tng-shsh Logic ---
     const vowelMap = {'a':'b','A':'B','e':'c','E':'C','i':'d','I':'D','o':'f','O':'F','u':'g','U':'G'};
     const reverseVowelMap = {'b':'a','B':'A','c':'e','C':'E','d':'i','D':'I','f':'o','F':'O','g':'u','G':'U'};
@@ -413,13 +370,6 @@
     async function copyToClipboard(id) {
       await navigator.clipboard.writeText(document.getElementById(id).innerText);
       alert("Copied!");
-    }
-
-    function copyShareLink() {
-      const url = new URL(window.location.href);
-      url.searchParams.set('t', document.getElementById('sentenceInput').value);
-      navigator.clipboard.writeText(url.toString());
-      alert("Link copied!");
     }
   </script>
 
