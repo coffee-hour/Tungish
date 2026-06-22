@@ -293,6 +293,51 @@ input:focus, textarea:focus {
 .action-btn.correct:hover { background: #22c55e; border-color: #22c55e; }
 .action-btn.wrong:hover { background: #ef4444; border-color: #ef4444; }
 
+/* --- tng-shsh Styles --- */
+.cipher-controls {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: var(--header-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.cipher-box {
+    margin-bottom: 30px;
+}
+
+.cipher-box h3 {
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+}
+
+.cipher-output-wrapper {
+    margin-top: 15px;
+    background: var(--header-bg);
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+}
+
+.cipher-text {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--tung-text);
+    margin-bottom: 15px;
+    word-break: break-all;
+    min-height: 1.5em;
+}
+
 /* --- Flashcard --- */
 .flashcard-container {
     perspective: 1000px;
