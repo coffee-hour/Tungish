@@ -4,67 +4,123 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233b82f6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M4 19.5A2.5 2.5 0 0 1 6.5 17H20%22></path><path d=%22M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z%22></path></svg>">
-  <title>Tunginised English Dictionary</title>
+  <title>Tunginised Dictionary & Translator</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="theme-default-dark">
+
+  <div class="settings-container">
+    <button class="settings-btn" id="settingsBtn" aria-label="Settings">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    </button>
+    <div class="settings-dropdown" id="settingsDropdown">
+      <h3>Theme</h3>
+      <button onclick="setTheme('theme-default-dark')">Default Dark</button>
+      <button onclick="setTheme('theme-neon')">High-Aura Neon</button>
+      <button onclick="setTheme('theme-crimson')">Crimson Red</button>
+    </div>
+  </div>
 
   <div class="container">
     <div class="header-area">
       <svg class="main-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-      <h1>Tunginised Dictionary</h1>
-      <p class="subtitle">Enter an English word to find its Tunginised translation.</p>
+      <h1>Tunginised</h1>
+      <p class="subtitle">The ultimate brainrot engine.</p>
     </div>
     
+    <div class="section-title">Dictionary Search</div>
     <div class="search-wrapper">
       <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input type="text" id="searchBar" placeholder="Type English word here..." onkeyup="search()">
+      <input type="text" id="searchBar" placeholder="Search English word..." onkeyup="search()">
     </div>
     
     <div id="results">
-      <p class="loading-text">Loading live data from Google Sheets...</p>
+      <p class="loading-text">Loading live data...</p>
+    </div>
+
+    <div class="divider-large"></div>
+
+    <div class="section-title">Sentence Translator</div>
+    <div class="translator-wrapper">
+      <textarea id="sentenceInput" placeholder="Type a full English sentence to Tunginise it..." oninput="translateSentence()"></textarea>
+      
+      <div id="translatorOutputWrapper" class="translator-output-wrapper">
+        <div id="auraMeter" class="aura-meter">Aura: --</div>
+        <div id="translatedSentence" class="translated-text">Waiting for input...</div>
+        <div class="translator-actions">
+          <button onclick="copyToClipboard()" class="action-btn">Copy</button>
+          <button onclick="copyShareLink()" class="action-btn">Share Link</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0pU4ikGI8VsgHRLCLlsGLxjjwOAnPjf1egul_uMoKnQYuhRKNaLaLpb65H89YIFm-MxRC6PeMprn_/pub?gid=0&single=true&output=csv';
     let dictionary = [];
+    let dictMap = new Map();
+
+    // Toggle Settings Dropdown
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsDropdown = document.getElementById('settingsDropdown');
+    settingsBtn.addEventListener('click', () => {
+      settingsDropdown.classList.toggle('active');
+    });
+    window.addEventListener('click', (e) => {
+      if (!settingsBtn.contains(e.target) && !settingsDropdown.contains(e.target)) {
+        settingsDropdown.classList.remove('active');
+      }
+    });
+
+    function setTheme(theme) {
+      document.body.className = theme;
+      localStorage.setItem('tungish-theme', theme);
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('tungish-theme');
+    if (savedTheme) setTheme(savedTheme);
 
     // Fetch the live spreadsheet data
     fetch(csvUrl)
       .then(response => response.text())
       .then(data => {
         const rows = data.split('\n');
-        // Loop through rows skipping the header line
         for (let i = 1; i < rows.length; i++) {
             if (rows[i].trim() !== '') {
-                dictionary.push(rows[i].split(','));
+                const cols = rows[i].split(',');
+                dictionary.push(cols);
+                if (cols[2] && cols[1]) {
+                    dictMap.set(cols[2].trim().toLowerCase(), cols[1].trim());
+                }
             }
         }
-        document.getElementById('results').innerHTML = '<p class="ready-text">Dictionary loaded! Type above to search.</p>';
+        document.getElementById('results').innerHTML = '<p class="ready-text">Dictionary loaded!</p>';
+        
+        // Handle URL params for sharing
+        const urlParams = new URLSearchParams(window.location.search);
+        const sharedText = urlParams.get('t');
+        if (sharedText) {
+          document.getElementById('sentenceInput').value = sharedText;
+          translateSentence();
+        }
       })
       .catch(error => {
         document.getElementById('results').innerHTML = '<p style="color:red; text-align:center;">Error loading dictionary.</p>';
       });
 
-    // The real-time search function
     function search() {
       const query = document.getElementById('searchBar').value.toLowerCase().trim();
       const resultsDiv = document.getElementById('results');
       resultsDiv.innerHTML = '';
-
       if (query === '') return; 
 
-      // Filtering by the English word in Column C (index 2)
-      const filtered = dictionary.filter(row =>
-        row[2] && row[2].toLowerCase().includes(query)
-      );
+      const filtered = dictionary.filter(row => row[2] && row[2].toLowerCase().includes(query));
 
       if (filtered.length === 0) {
           resultsDiv.innerHTML = '<p class="no-results">No matching English words found.</p>';
       } else {
           filtered.forEach(row => {
-             // row[2] is English (Col C), row[1] is Tunginised (Col B)
              if(row[2] && row[1]) {
                resultsDiv.innerHTML += `
                  <div class="card">
@@ -81,6 +137,75 @@
              }
           });
       }
+    }
+
+    function tunginiseWord(word) {
+      const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+      if (!cleanWord) return word;
+      
+      // 1. Dictionary lookup
+      if (dictMap.has(cleanWord)) {
+        return dictMap.get(cleanWord);
+      }
+      
+      // 2. Fallback compression: strip vowels, no "sa-" prefix
+      let compressed = word.replace(/[aeiouAEIOU]/g, '');
+      // Ensure no "sa-" prefix (case insensitive)
+      if (compressed.toLowerCase().startsWith('sa')) {
+        compressed = compressed.substring(2);
+      }
+      return compressed || word;
+    }
+
+    function translateSentence() {
+      const input = document.getElementById('sentenceInput').value;
+      if (!input.trim()) {
+        document.getElementById('translatedSentence').innerText = "Waiting for input...";
+        document.getElementById('auraMeter').innerText = "Aura: --";
+        return;
+      }
+
+      const words = input.split(/\s+/);
+      let translatedWords = [];
+      let compressedCount = 0;
+
+      words.forEach(word => {
+        const clean = word.toLowerCase().replace(/[^\w]/g, '');
+        const translated = tunginiseWord(word);
+        translatedWords.push(translated);
+        
+        // Count as "compressed" if it doesn't exist in dict but was transformed (or just the fallback logic)
+        if (!dictMap.has(clean) && clean.length > 0) {
+          compressedCount++;
+        }
+      });
+
+      const result = translatedWords.join(' ');
+      document.getElementById('translatedSentence').innerText = result;
+
+      // Aura Meter logic
+      const density = (compressedCount / words.length) * 100;
+      let auraText = "";
+      if (density > 80) auraText = "God-tier Aura";
+      else if (density > 50) auraText = "High Aura";
+      else if (density > 20) auraText = "Mid Aura";
+      else auraText = "Cooked";
+      
+      document.getElementById('auraMeter').innerText = `Aura: ${auraText} (${Math.round(density)}%)`;
+    }
+
+    async function copyToClipboard() {
+      const text = document.getElementById('translatedSentence').innerText;
+      await navigator.clipboard.writeText(text);
+      alert("Copied to clipboard!");
+    }
+
+    function copyShareLink() {
+      const input = document.getElementById('sentenceInput').value;
+      const url = new URL(window.location.href);
+      url.searchParams.set('t', input);
+      navigator.clipboard.writeText(url.toString());
+      alert("Share link copied!");
     }
   </script>
 
