@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tunginised English Dictionary</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>📖 Tunginised Dictionary</h1>
+    <p class="subtitle">Search for an English or Tunginised word below.</p>
+    
+    <div class="search-wrapper">
+      <input type="text" id="searchBar" placeholder="Search dictionary..." onkeyup="search()">
+    </div>
+    
+    <div id="results">
+      <p class="loading-text">Loading live data from Google Sheets...</p>
+    </div>
+  </div>
+
+  <script>
+    // Notice how we changed 'pubhtml' to 'pub?output=csv' so the code can read it properly!
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0pU4ikGI8VsgHRLCLlsGLxjjwOAnPjf1egul_uMoKnQYuhRKNaLaLpb65H89YIFm-MxRC6PeMprn_/pub?gid=0&single=true&output=csv';
+    let dictionary = [];
+
+    // Fetch the live spreadsheet data
+    fetch(csvUrl)
+      .then(response => response.text())
+      .then(data => {
+        // Split the CSV into rows and columns
+        const rows = data.split('\n');
+        // Start from index 1 to skip the header row (English, Tunginised)
+        for (let i = 1; i < rows.length; i++) {
+            if (rows[i].trim() !== '') {
+                dictionary.push(rows[i].split(','));
+            }
+        }
+        document.getElementById('results').innerHTML = '<p class="ready-text"><i>Dictionary loaded! Type to search.</i></p>';
+      })
+      .catch(error => {
+        document.getElementById('results').innerHTML = '<p style="color:red;">Error loading dictionary. Check console.</p>';
+      });
+
+    // The real-time search function
+    function search() {
+      const query = document.getElementById('searchBar').value.toLowerCase().trim();
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+
+      if (query === '') return; // Keep clean if search is empty
+
+      // Filter the dictionary based on the query
+      const filtered = dictionary.filter(row =>
+        (row[0] && row[0].toLowerCase().includes(query)) ||
+        (row[1] && row[1].toLowerCase().includes(query))
+      );
+
+      // Build the visual cards for the matches
+      if (filtered.length === 0) {
+          resultsDiv.innerHTML = '<p class="no-results">No matching words found.</p>';
+      } else {
+          filtered.forEach(row => {
+             if(row[0] && row[1]) {
+               resultsDiv.innerHTML += `
+                 <div class="card">
+                   <div class="english">🇬🇧 ${row[0].trim()}</div>
+                   <div class="tunginised">🗣️ ${row[1].trim()}</div>
+                 </div>`;
+             }
+          });
+      }
+    }
+  </script>
+
+</body>
+</html>
