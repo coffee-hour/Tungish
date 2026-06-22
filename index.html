@@ -54,21 +54,22 @@
 
       if (query === '') return; 
 
-      // Strictly filtering by the English word column (row[0])
+      // Filtering by the English word in Column C (index 2)
       const filtered = dictionary.filter(row =>
-        row[0] && row[0].toLowerCase().includes(query)
+        row[2] && row[2].toLowerCase().includes(query)
       );
 
       if (filtered.length === 0) {
           resultsDiv.innerHTML = '<p class="no-results">No matching English words found.</p>';
       } else {
           filtered.forEach(row => {
-             if(row[0] && row[1]) {
+             // row[2] is English (Col C), row[1] is Tunginised (Col B)
+             if(row[2] && row[1]) {
                resultsDiv.innerHTML += `
                  <div class="card">
                    <div class="word-row">
                      <span class="badge english-badge">ENG</span>
-                     <span class="english-word">${row[0].trim()}</span>
+                     <span class="english-word">${row[2].trim()}</span>
                    </div>
                    <div class="divider"></div>
                    <div class="word-row">
