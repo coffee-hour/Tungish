@@ -222,14 +222,6 @@ input:focus, textarea:focus {
     box-shadow: var(--shadow);
 }
 
-.aura-meter {
-    font-size: 0.75em;
-    font-weight: 700;
-    color: var(--accent-color);
-    margin-bottom: 10px;
-    text-transform: uppercase;
-}
-
 .translated-text {
     font-size: 1.25em;
     font-weight: 600;

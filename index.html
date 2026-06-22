@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233b82f6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M4 19.5A2.5 2.5 0 0 1 6.5 17H20%22></path><path d=%22M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z%22></path></svg>">
-  <title>Tunginised Dictionary & Translator</title>
+  <title>Tunginised English Dictionary & Translator</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-default-dark">
@@ -23,9 +23,9 @@
 
   <div class="container">
     <div class="header-area">
-      <svg class="main-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      <svg class="main-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20%22></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
       <h1>Tunginised</h1>
-      <p class="subtitle">The ultimate brainrot engine.</p>
+      <p class="subtitle">English Dictionary & Translator</p>
     </div>
     
     <div class="section-title">Dictionary Search</div>
@@ -42,10 +42,9 @@
 
     <div class="section-title">Sentence Translator</div>
     <div class="translator-wrapper">
-      <textarea id="sentenceInput" placeholder="Type a full English sentence to Tunginise it..." oninput="translateSentence()"></textarea>
+      <textarea id="sentenceInput" placeholder="Type a full English sentence to translate..." oninput="translateSentence()"></textarea>
       
       <div id="translatorOutputWrapper" class="translator-output-wrapper">
-        <div id="auraMeter" class="aura-meter">Aura: --</div>
         <div id="translatedSentence" class="translated-text">Waiting for input...</div>
         <div class="translator-actions">
           <button onclick="copyToClipboard()" class="action-btn">Copy</button>
@@ -161,37 +160,19 @@
       const input = document.getElementById('sentenceInput').value;
       if (!input.trim()) {
         document.getElementById('translatedSentence').innerText = "Waiting for input...";
-        document.getElementById('auraMeter').innerText = "Aura: --";
         return;
       }
 
       const words = input.split(/\s+/);
       let translatedWords = [];
-      let compressedCount = 0;
 
       words.forEach(word => {
-        const clean = word.toLowerCase().replace(/[^\w]/g, '');
         const translated = tunginiseWord(word);
         translatedWords.push(translated);
-        
-        // Count as "compressed" if it doesn't exist in dict but was transformed (or just the fallback logic)
-        if (!dictMap.has(clean) && clean.length > 0) {
-          compressedCount++;
-        }
       });
 
       const result = translatedWords.join(' ');
       document.getElementById('translatedSentence').innerText = result;
-
-      // Aura Meter logic
-      const density = (compressedCount / words.length) * 100;
-      let auraText = "";
-      if (density > 80) auraText = "God-tier Aura";
-      else if (density > 50) auraText = "High Aura";
-      else if (density > 20) auraText = "Mid Aura";
-      else auraText = "Cooked";
-      
-      document.getElementById('auraMeter').innerText = `Aura: ${auraText} (${Math.round(density)}%)`;
     }
 
     async function copyToClipboard() {
