@@ -24,8 +24,8 @@ body {
 }
 
 .main-icon {
-    width: 44px;
-    height: 44px;
+    width: 28px;  /* Shrunk down from 44px */
+    height: 28px; /* Shrunk down from 44px */
     color: #3b82f6;
     margin-bottom: 10px;
 }
@@ -54,15 +54,15 @@ h1 {
     left: 20px;
     top: 50%;
     transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+    width: 16px;  /* Shrunk down from 20px */
+    height: 16px; /* Shrunk down from 20px */
     color: #94a3b8;
     pointer-events: none;
 }
 
 input {
     width: 100%;
-    padding: 16px 20px 16px 54px;
+    padding: 16px 20px 16px 50px; /* Adjusted padding to match smaller icon */
     font-size: 16px;
     font-family: 'Inter', sans-serif;
     border-radius: 14px;
