@@ -9,11 +9,15 @@
 <body>
 
   <div class="container">
-    <h1>📖 Tunginised Dictionary</h1>
-    <p class="subtitle">Search for an English or Tunginised word below.</p>
+    <div class="header-area">
+      <svg class="main-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      <h1>Tunginised Dictionary</h1>
+      <p class="subtitle">Enter an English word to find its Tunginised translation.</p>
+    </div>
     
     <div class="search-wrapper">
-      <input type="text" id="searchBar" placeholder="Search dictionary..." onkeyup="search()">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" id="searchBar" placeholder="Type English word here..." onkeyup="search()">
     </div>
     
     <div id="results">
@@ -22,7 +26,6 @@
   </div>
 
   <script>
-    // Notice how we changed 'pubhtml' to 'pub?output=csv' so the code can read it properly!
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0pU4ikGI8VsgHRLCLlsGLxjjwOAnPjf1egul_uMoKnQYuhRKNaLaLpb65H89YIFm-MxRC6PeMprn_/pub?gid=0&single=true&output=csv';
     let dictionary = [];
 
@@ -30,18 +33,17 @@
     fetch(csvUrl)
       .then(response => response.text())
       .then(data => {
-        // Split the CSV into rows and columns
         const rows = data.split('\n');
-        // Start from index 1 to skip the header row (English, Tunginised)
+        // Loop through rows skipping the header line
         for (let i = 1; i < rows.length; i++) {
             if (rows[i].trim() !== '') {
                 dictionary.push(rows[i].split(','));
             }
         }
-        document.getElementById('results').innerHTML = '<p class="ready-text"><i>Dictionary loaded! Type to search.</i></p>';
+        document.getElementById('results').innerHTML = '<p class="ready-text">Dictionary loaded! Type above to search.</p>';
       })
       .catch(error => {
-        document.getElementById('results').innerHTML = '<p style="color:red;">Error loading dictionary. Check console.</p>';
+        document.getElementById('results').innerHTML = '<p style="color:red; text-align:center;">Error loading dictionary.</p>';
       });
 
     // The real-time search function
@@ -50,24 +52,29 @@
       const resultsDiv = document.getElementById('results');
       resultsDiv.innerHTML = '';
 
-      if (query === '') return; // Keep clean if search is empty
+      if (query === '') return; 
 
-      // Filter the dictionary based on the query
+      // Strictly filtering by the English word column (row[0])
       const filtered = dictionary.filter(row =>
-        (row[0] && row[0].toLowerCase().includes(query)) ||
-        (row[1] && row[1].toLowerCase().includes(query))
+        row[0] && row[0].toLowerCase().includes(query)
       );
 
-      // Build the visual cards for the matches
       if (filtered.length === 0) {
-          resultsDiv.innerHTML = '<p class="no-results">No matching words found.</p>';
+          resultsDiv.innerHTML = '<p class="no-results">No matching English words found.</p>';
       } else {
           filtered.forEach(row => {
              if(row[0] && row[1]) {
                resultsDiv.innerHTML += `
                  <div class="card">
-                   <div class="english">🇬🇧 ${row[0].trim()}</div>
-                   <div class="tunginised">🗣️ ${row[1].trim()}</div>
+                   <div class="word-row">
+                     <span class="badge english-badge">ENG</span>
+                     <span class="english-word">${row[0].trim()}</span>
+                   </div>
+                   <div class="divider"></div>
+                   <div class="word-row">
+                     <span class="badge tung-badge">TUNG</span>
+                     <span class="tunginised-word">${row[1].trim()}</span>
+                   </div>
                  </div>`;
              }
           });
