@@ -33,13 +33,25 @@
       <button class="tab-btn" onclick="switchTab('translator')">Translate</button>
       <button class="tab-btn" onclick="switchTab('tngshsh')">TngShsh</button>
       <button class="tab-btn" onclick="switchTab('games')">Games</button>
+      <button class="tab-btn" onclick="switchTab('explorer')">Explorer</button>
     </div>
     
     <div id="dictionaryTab" class="tab-content active">
+      <div id="statsPanel" class="stats-panel card">
+        <div class="stat-item">
+          <span class="stat-label">Total Words</span>
+          <span id="totalWordsStat" class="stat-value">...</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Latest Word</span>
+          <span id="latestWordStat" class="stat-value">...</span>
+        </div>
+      </div>
+
       <div class="section-title">Dictionary Search</div>
       <div class="search-wrapper">
         <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" id="searchBar" placeholder="Search English word..." onkeyup="search()">
+        <input type="text" id="searchBar" placeholder="Search English or Tungish..." onkeyup="search()">
       </div>
       <div id="results">
         <p class="loading-text">Loading live data...</p>
@@ -86,6 +98,19 @@
     </div>
 
     <div id="gamesTab" class="tab-content">
+      <div class="section-title">wrdl Game</div>
+      <div id="wrdlContainer" class="card wrdl-container">
+        <div id="wrdlClue" class="wrdl-clue">Loading game...</div>
+        <div id="wrdlBoard" class="wrdl-board"></div>
+        <div class="wrdl-input-area">
+          <input type="text" id="wrdlInput" placeholder="Type guess..." maxlength="20">
+          <button onclick="submitWrdlGuess()" class="action-btn">Guess</button>
+        </div>
+        <div id="wrdlFeedback" class="wrdl-feedback"></div>
+      </div>
+
+      <div class="divider-large"></div>
+
       <div class="section-title">Random Word</div>
       <div id="randomWordCard" class="card" style="text-align: center; cursor: pointer;" onclick="getRandomWord()">
         <p class="subtitle" style="margin-bottom: 10px;">Click for a random word</p>
@@ -120,14 +145,30 @@
       </div>
     </div>
 
+    <div id="explorerTab" class="tab-content">
+      <div class="section-title">Word Explorer</div>
+      <div id="explorerControls" class="explorer-controls">
+        <button onclick="navigateExplorer(-1)" class="action-btn">Prev</button>
+        <div id="explorerIndexDisplay">0 / 0</div>
+        <button onclick="navigateExplorer(1)" class="action-btn">Next</button>
+      </div>
+      <div id="explorerContent"></div>
+    </div>
+
   </div>
 
   <script>
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0pU4ikGI8VsgHRLCLlsGLxjjwOAnPjf1egul_uMoKnQYuhRKNaLaLpb65H89YIFm-MxRC6PeMprn_/pub?gid=0&single=true&output=csv';
     let dictionary = [];
     let dictMap = new Map();
+    let reverseDictMap = new Map();
     let score = 0;
     let currentCard = null;
+    let explorerIndex = 0;
+
+    // wrdl State
+    let currentWrdlWord = null;
+    let wrdlGuesses = [];
 
     function switchTab(tabName) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -135,6 +176,9 @@
       
       document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
       document.getElementById(`${tabName}Tab`).classList.add('active');
+
+      if (tabName === 'explorer') renderExplorer();
+      if (tabName === 'games' && !currentWrdlWord) initWrdl();
     }
 
     // Toggle Settings Dropdown
@@ -160,17 +204,19 @@
     fetch(csvUrl)
       .then(response => response.text())
       .then(data => {
-        const rows = data.split('\n');
+        const rows = data.split('\n').filter(r => r.trim() !== '');
         for (let i = 1; i < rows.length; i++) {
-            if (rows[i].trim() !== '') {
-                const cols = rows[i].split(',');
-                if (cols[2] && cols[1]) {
-                    dictionary.push(cols);
-                    dictMap.set(cols[2].trim().toLowerCase(), cols[1].trim());
-                }
+            const cols = rows[i].split(',');
+            if (cols[2] && cols[1]) {
+                const eng = cols[2].trim();
+                const tung = cols[1].trim();
+                dictionary.push([cols[0], tung, eng]);
+                dictMap.set(eng.toLowerCase(), tung);
+                reverseDictMap.set(tung.toLowerCase(), eng);
             }
         }
         document.getElementById('results').innerHTML = '<p class="ready-text">Dictionary loaded!</p>';
+        updateStats();
         newQuizCard();
         
         const urlParams = new URLSearchParams(window.location.search);
@@ -185,32 +231,105 @@
         document.getElementById('results').innerHTML = '<p style="color:red; text-align:center;">Error loading dictionary.</p>';
       });
 
+    function updateStats() {
+      if (dictionary.length === 0) return;
+      document.getElementById('totalWordsStat').innerText = dictionary.length;
+      document.getElementById('latestWordStat').innerText = dictionary[dictionary.length - 1][2];
+    }
+
     function search() {
       const query = document.getElementById('searchBar').value.toLowerCase().trim();
       const resultsDiv = document.getElementById('results');
       resultsDiv.innerHTML = '';
       if (query === '') return; 
 
-      const filtered = dictionary.filter(row => row[2] && row[2].toLowerCase().includes(query));
+      const filtered = dictionary.filter(row => 
+        (row[2] && row[2].toLowerCase().includes(query)) || 
+        (row[1] && row[1].toLowerCase().includes(query))
+      );
 
       if (filtered.length === 0) {
-          resultsDiv.innerHTML = '<p class="no-results">No matching English words found.</p>';
+          resultsDiv.innerHTML = '<p class="no-results">No matches found.</p>';
       } else {
-          filtered.forEach(row => {
+          filtered.slice(0, 50).forEach(row => {
              resultsDiv.innerHTML += `
-               <div class="card">
+               <div class="card word-card">
                  <div class="word-row">
                    <span class="badge english-badge">ENG</span>
-                   <span class="english-word">${row[2].trim()}</span>
+                   <span class="english-word">${row[2]}</span>
                  </div>
                    <div class="divider"></div>
                  <div class="word-row">
                    <span class="badge tung-badge">TUNG</span>
-                   <span class="tunginised-word">${row[1].trim()}</span>
+                   <span class="tunginised-word">${row[1]}</span>
                  </div>
                </div>`;
           });
       }
+    }
+
+    function renderExplorer() {
+      if (dictionary.length === 0) return;
+      const display = document.getElementById('explorerIndexDisplay');
+      const content = document.getElementById('explorerContent');
+      
+      display.innerText = `${explorerIndex + 1} / ${dictionary.length}`;
+      const row = dictionary[explorerIndex];
+      
+      content.innerHTML = `
+        <div class="card word-card explorer-card">
+          <div class="word-row">
+            <span class="badge english-badge">ENG</span>
+            <span class="english-word">${row[2]}</span>
+          </div>
+          <div class="divider"></div>
+          <div class="word-row">
+            <span class="badge tung-badge">TUNG</span>
+            <span class="tunginised-word">${row[1]}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function navigateExplorer(dir) {
+      explorerIndex = (explorerIndex + dir + dictionary.length) % dictionary.length;
+      renderExplorer();
+    }
+
+    function initWrdl() {
+      if (dictionary.length === 0) return;
+      currentWrdlWord = dictionary[Math.floor(Math.random() * dictionary.length)];
+      wrdlGuesses = [];
+      document.getElementById('wrdlClue').innerText = `Clue: ${currentWrdlWord[2]} (English)`;
+      document.getElementById('wrdlBoard').innerHTML = '';
+      document.getElementById('wrdlFeedback').innerText = '';
+    }
+
+    function submitWrdlGuess() {
+      const input = document.getElementById('wrdlInput');
+      const guess = input.value.trim().toLowerCase();
+      if (!guess) return;
+
+      const target = currentWrdlWord[1].toLowerCase();
+      wrdlGuesses.push(guess);
+      input.value = '';
+
+      const board = document.getElementById('wrdlBoard');
+      const guessRow = document.createElement('div');
+      guessRow.className = 'wrdl-row';
+      
+      if (guess === target) {
+        guessRow.innerHTML = `<span class="wrdl-status win">Correct! ${guess.toUpperCase()}</span>`;
+        document.getElementById('wrdlFeedback').innerText = "Winner! Loading next word...";
+        setTimeout(initWrdl, 3000);
+      } else {
+        guessRow.innerHTML = `<span class="wrdl-status fail">${guess.toUpperCase()}</span>`;
+        if (wrdlGuesses.length >= 6) {
+          document.getElementById('wrdlFeedback').innerText = `Game Over. The word was ${target.toUpperCase()}`;
+          setTimeout(initWrdl, 3000);
+        }
+      }
+      board.appendChild(guessRow);
     }
 
     function tunginiseWord(word) {
@@ -233,68 +352,34 @@
       document.getElementById('translatedSentence').innerText = result;
     }
 
-    // --- tng-shsh Reversible Vowel-Encoding Escape Algorithm ---
-    const vowelMap = {
-      'a': 'b', 'A': 'B',
-      'e': 'c', 'E': 'C',
-      'i': 'd', 'D': 'D',
-      'o': 'f', 'O': 'F',
-      'u': 'g', 'U': 'G'
-    };
-
-    const reverseVowelMap = {
-      'b': 'a', 'B': 'A',
-      'c': 'e', 'C': 'E',
-      'd': 'i', 'D': 'I',
-      'f': 'o', 'F': 'O',
-      'g': 'u', 'G': 'U'
-    };
+    // --- tng-shsh Logic ---
+    const vowelMap = {'a':'b','A':'B','e':'c','E':'C','i':'d','I':'D','o':'f','O':'F','u':'g','U':'G'};
+    const reverseVowelMap = {'b':'a','B':'A','c':'e','C':'E','d':'i','D':'I','f':'o','F':'O','g':'u','G':'U'};
 
     function handleEncrypt() {
       const input = document.getElementById('encryptInput').value;
-      if (!input.trim()) {
-        document.getElementById('encryptOutput').innerText = "Result will appear here...";
-        return;
-      }
+      if (!input.trim()) return;
       let result = '';
-      for (let i = 0; i < input.length; i++) {
-        const char = input[i];
-        if (char === 'q') {
-          result += 'qq';
-        } else if (char === 'Q') {
-          result += 'QQ';
-        } else if (vowelMap[char]) {
-          result += (char === char.toUpperCase() ? 'Q' : 'q') + vowelMap[char];
-        } else {
-          result += char;
-        }
+      for (let char of input) {
+        if (char === 'q' || char === 'Q') result += char + char;
+        else if (vowelMap[char]) result += (char === char.toUpperCase() ? 'Q' : 'q') + vowelMap[char];
+        else result += char;
       }
       document.getElementById('encryptOutput').innerText = result;
     }
 
     function handleDecrypt() {
       const input = document.getElementById('decryptInput').value;
-      if (!input.trim()) {
-        document.getElementById('decryptOutput').innerText = "Translation will appear here...";
-        return;
-      }
+      if (!input.trim()) return;
       let result = '';
       for (let i = 0; i < input.length; i++) {
         const char = input[i];
         if ((char === 'q' || char === 'Q') && i + 1 < input.length) {
-          const nextChar = input[i + 1];
-          if (nextChar === 'q' || nextChar === 'Q') {
-            result += nextChar;
-            i++;
-          } else if (reverseVowelMap[nextChar]) {
-            result += (char === 'Q' ? reverseVowelMap[nextChar].toUpperCase() : reverseVowelMap[nextChar].toLowerCase());
-            i++;
-          } else {
-            result += char;
-          }
-        } else {
-          result += char;
-        }
+          const next = input[i+1];
+          if (next === 'q' || next === 'Q') { result += next; i++; }
+          else if (reverseVowelMap[next]) { result += (char === 'Q' ? reverseVowelMap[next].toUpperCase() : reverseVowelMap[next]); i++; }
+          else result += char;
+        } else result += char;
       }
       document.getElementById('decryptOutput').innerText = result;
     }
@@ -303,43 +388,38 @@
       if (dictionary.length === 0) return;
       const row = dictionary[Math.floor(Math.random() * dictionary.length)];
       document.getElementById('randomWordContent').innerHTML = `
-        <span class="english-word">${row[2].trim()}</span>
+        <span class="english-word">${row[2]}</span>
         <div class="divider"></div>
-        <span class="tunginised-word">${row[1].trim()}</span>
+        <span class="tunginised-word">${row[1]}</span>
       `;
     }
 
-    function flipCard() {
-      document.getElementById('flashcard').classList.toggle('flipped');
-    }
+    function flipCard() { document.getElementById('flashcard').classList.toggle('flipped'); }
 
     function newQuizCard() {
       if (dictionary.length === 0) return;
       document.getElementById('flashcard').classList.remove('flipped');
       currentCard = dictionary[Math.floor(Math.random() * dictionary.length)];
-      document.getElementById('cardFrontText').innerText = currentCard[1].trim();
-      document.getElementById('cardBackText').innerText = currentCard[2].trim();
+      document.getElementById('cardFrontText').innerText = currentCard[1];
+      document.getElementById('cardBackText').innerText = currentCard[2];
     }
 
     function checkAnswer(correct) {
-      if (correct) score++;
-      else if (score > 0) score--;
+      if (correct) score++; else if (score > 0) score--;
       document.getElementById('score').innerText = score;
       newQuizCard();
     }
 
-    async function copyToClipboard(elementId) {
-      const text = document.getElementById(elementId).innerText;
-      await navigator.clipboard.writeText(text);
-      alert("Copied to clipboard!");
+    async function copyToClipboard(id) {
+      await navigator.clipboard.writeText(document.getElementById(id).innerText);
+      alert("Copied!");
     }
 
     function copyShareLink() {
-      const input = document.getElementById('sentenceInput').value;
       const url = new URL(window.location.href);
-      url.searchParams.set('t', input);
+      url.searchParams.set('t', document.getElementById('sentenceInput').value);
       navigator.clipboard.writeText(url.toString());
-      alert("Share link copied!");
+      alert("Link copied!");
     }
   </script>
 

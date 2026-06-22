@@ -42,7 +42,7 @@ body.theme-crimson {
     --header-bg: #2d0f0f;
     --text-primary: #fecaca;
     --text-secondary: #ef4444;
-    --accent-color: #b91c1c;
+    --accent-color: #ef4444;
     --card-bg: #2d0f0f;
     --border-color: #451a1a;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
@@ -67,6 +67,87 @@ body {
     padding: 80px 20px 60px 20px;
 }
 
+/* --- Stats Panel --- */
+.stats-panel {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.75em;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+/* --- Explorer --- */
+.explorer-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+#explorerIndexDisplay {
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+/* --- wrdl --- */
+.wrdl-container {
+    text-align: center;
+    padding: 24px;
+}
+
+.wrdl-clue {
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+}
+
+.wrdl-board {
+    margin-bottom: 20px;
+}
+
+.wrdl-row {
+    margin-bottom: 8px;
+}
+
+.wrdl-status {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.9em;
+}
+
+.wrdl-status.win { background: #22c55e; color: #fff; }
+.wrdl-status.fail { background: var(--border-color); color: var(--text-secondary); }
+
+.wrdl-input-area {
+    display: flex;
+    gap: 10px;
+}
+
+.wrdl-feedback {
+    margin-top: 15px;
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
 /* --- Tabs --- */
 .tabs {
     display: flex;
@@ -76,6 +157,7 @@ body {
     padding: 6px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
+    overflow-x: auto;
 }
 
 .tab-btn {
@@ -88,7 +170,8 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    font-size: 0.9em;
+    font-size: 0.85em;
+    white-space: nowrap;
 }
 
 .tab-btn.active {
@@ -120,11 +203,6 @@ body {
     border-radius: 50%;
     cursor: pointer;
     box-shadow: var(--shadow);
-    transition: transform 0.2s;
-}
-
-.settings-btn:hover {
-    transform: rotate(45deg);
 }
 
 .settings-dropdown {
@@ -146,14 +224,6 @@ body {
     display: flex;
 }
 
-.settings-dropdown h3 {
-    margin: 0 0 10px 0;
-    font-size: 0.9em;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
 .settings-dropdown button {
     background: none;
     border: 1px solid var(--border-color);
@@ -161,17 +231,15 @@ body {
     padding: 8px 12px;
     border-radius: 6px;
     cursor: pointer;
-    text-align: left;
     font-size: 0.9em;
 }
 
 .settings-dropdown button:hover {
     background: var(--accent-color);
     color: #fff;
-    border-color: var(--accent-color);
 }
 
-/* --- Header Section --- */
+/* --- Header --- */
 .header-area {
     text-align: center;
     margin-bottom: 40px;
@@ -188,244 +256,32 @@ h1 {
     color: var(--text-primary);
     font-size: 2.2em;
     font-weight: 700;
-    margin: 0 0 8px 0;
+    margin: 0;
 }
 
 .subtitle {
     color: var(--text-secondary);
-    margin: 0;
     font-size: 0.95em;
 }
 
-.section-title {
-    font-size: 0.85em;
-    font-weight: 700;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 15px;
-}
-
-/* --- Search Bar --- */
-.search-wrapper {
-    position: relative;
-    margin-bottom: 35px;
-}
-
-.search-icon {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    color: var(--text-secondary);
-    pointer-events: none;
-}
-
+/* --- Inputs & Cards --- */
 input, textarea {
     width: 100%;
-    padding: 16px 20px 16px 50px;
+    padding: 14px 20px;
     font-size: 16px;
-    font-family: 'Inter', sans-serif;
     border-radius: 14px;
     border: 1px solid var(--border-color);
-    outline: none;
     background-color: var(--card-bg);
     color: var(--text-primary);
-    transition: all 0.2s ease;
-    box-sizing: border-box;
     box-shadow: var(--shadow);
-}
-
-textarea {
-    padding: 16px;
-    min-height: 100px;
-    resize: vertical;
+    box-sizing: border-box;
 }
 
 input:focus, textarea:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    outline: none;
 }
 
-/* --- Translator --- */
-.translator-output-wrapper {
-    margin-top: 20px;
-    background: var(--card-bg);
-    padding: 24px;
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow);
-}
-
-.translated-text {
-    font-size: 1.25em;
-    font-weight: 600;
-    color: var(--tung-text);
-    margin-bottom: 20px;
-    line-height: 1.5;
-}
-
-.translator-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.action-btn {
-    background: var(--header-bg);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.9em;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.action-btn:hover {
-    background: var(--accent-color);
-    color: #fff;
-    border-color: var(--accent-color);
-}
-
-.action-btn.correct:hover { background: #22c55e; border-color: #22c55e; }
-.action-btn.wrong:hover { background: #ef4444; border-color: #ef4444; }
-
-/* --- tng-shsh Styles --- */
-.cipher-controls {
-    margin-bottom: 25px;
-    padding: 20px;
-    background: var(--header-bg);
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-}
-
-.input-group label {
-    display: block;
-    font-size: 0.9em;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 10px;
-}
-
-.cipher-box {
-    margin-bottom: 30px;
-}
-
-.cipher-box h3 {
-    font-size: 1em;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 15px;
-}
-
-.cipher-output-wrapper {
-    margin-top: 15px;
-    background: var(--header-bg);
-    padding: 20px;
-    border-radius: 14px;
-    border: 1px solid var(--border-color);
-}
-
-.cipher-text {
-    font-size: 1.1em;
-    font-weight: 600;
-    color: var(--tung-text);
-    margin-bottom: 15px;
-    word-break: break-all;
-    min-height: 1.5em;
-}
-
-/* --- Flashcard --- */
-.flashcard-container {
-    perspective: 1000px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-}
-
-.score-board {
-    font-weight: 700;
-    color: var(--accent-color);
-}
-
-.flashcard {
-    width: 100%;
-    height: 200px;
-    cursor: pointer;
-}
-
-.flashcard-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-    box-shadow: var(--shadow);
-    border-radius: 16px;
-}
-
-.flashcard.flipped .flashcard-inner {
-    transform: rotateY(180deg);
-}
-
-.flashcard-front, .flashcard-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.flashcard-back {
-    transform: rotateY(180deg);
-}
-
-.flashcard .word {
-    font-size: 1.8em;
-    font-weight: 700;
-}
-
-.quiz-controls {
-    display: flex;
-    gap: 15px;
-    width: 100%;
-}
-
-.quiz-controls .action-btn { flex: 1; text-align: center; }
-
-/* --- Results Area --- */
-#results {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.loading-text, .ready-text, .no-results {
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: 0.95em;
-}
-
-.divider-large {
-    height: 1px;
-    background: var(--border-color);
-    margin: 40px 0;
-}
-
-/* --- App Cards & Badges --- */
 .card {
     background: var(--card-bg);
     padding: 24px;
@@ -441,47 +297,43 @@ input:focus, textarea:focus {
 }
 
 .badge {
-    font-size: 0.75rem;
+    font-size: 0.7em;
     font-weight: 700;
     padding: 4px 8px;
     border-radius: 6px;
-    letter-spacing: 0.5px;
-    margin-bottom: 10px;
 }
 
-.english-badge {
-    background-color: rgba(59, 130, 246, 0.1);
-    color: var(--accent-color);
-}
+.english-badge { background: rgba(56, 189, 248, 0.1); color: var(--accent-color); }
+.tung-badge { background: rgba(248, 113, 113, 0.1); color: var(--tung-text); }
 
-.tung-badge {
-    background-color: rgba(220, 38, 38, 0.1);
-    color: var(--tung-text);
-}
+.english-word { font-weight: 600; font-size: 1.2em; color: var(--text-primary); }
+.tunginised-word { font-weight: 600; font-size: 1.2em; color: var(--tung-text); }
 
-.english-word {
-    font-weight: 600;
-    font-size: 1.25em;
+.divider { height: 1px; background: var(--border-color); margin: 14px 0; }
+.divider-large { height: 1px; background: var(--border-color); margin: 40px 0; }
+
+.action-btn {
+    background: var(--header-bg);
+    border: 1px solid var(--border-color);
     color: var(--text-primary);
-}
-
-.tunginised-word {
+    padding: 10px 18px;
+    border-radius: 10px;
     font-weight: 600;
-    font-size: 1.25em;
-    color: var(--tung-text);
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-.divider {
-    height: 1px;
-    background-color: var(--border-color);
-    margin: 14px 0;
-}
+.action-btn:hover { background: var(--accent-color); color: #fff; }
+
+/* --- Flashcard --- */
+.flashcard-container { perspective: 1000px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.flashcard { width: 100%; height: 200px; cursor: pointer; }
+.flashcard-inner { position: relative; width: 100%; height: 100%; transition: 0.6s; transform-style: preserve-3d; }
+.flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+.flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-sizing: border-box; }
+.flashcard-back { transform: rotateY(180deg); }
+.flashcard .word { font-size: 1.8em; font-weight: 700; }
 
 @media (max-width: 600px) {
-    .container {
-        padding: 60px 15px 40px 15px;
-    }
-    h1 {
-        font-size: 1.8em;
-    }
+    .container { padding: 40px 15px; }
 }
