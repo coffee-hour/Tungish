@@ -78,11 +78,11 @@
         <div id="flashcard" class="flashcard" onclick="flipCard()">
           <div class="flashcard-inner">
             <div class="flashcard-front">
-              <div class="badge english-badge">ENG</div>
+              <div class="badge tung-badge">TUNG</div>
               <div id="cardFrontText" class="word">Loading...</div>
             </div>
             <div class="flashcard-back">
-              <div class="badge tung-badge">TUNG</div>
+              <div class="badge english-badge">ENG</div>
               <div id="cardBackText" class="word">...</div>
             </div>
           </div>
@@ -177,7 +177,7 @@
                    <span class="badge english-badge">ENG</span>
                    <span class="english-word">${row[2].trim()}</span>
                  </div>
-                 <div class="divider"></div>
+                   <div class="divider"></div>
                  <div class="word-row">
                    <span class="badge tung-badge">TUNG</span>
                    <span class="tunginised-word">${row[1].trim()}</span>
@@ -225,8 +225,9 @@
       if (dictionary.length === 0) return;
       document.getElementById('flashcard').classList.remove('flipped');
       currentCard = dictionary[Math.floor(Math.random() * dictionary.length)];
-      document.getElementById('cardFrontText').innerText = currentCard[2].trim();
-      document.getElementById('cardBackText').innerText = currentCard[1].trim();
+      // Updated: Front displays Tungish (index 1), Back displays English (index 2)
+      document.getElementById('cardFrontText').innerText = currentCard[1].trim();
+      document.getElementById('cardBackText').innerText = currentCard[2].trim();
     }
 
     function checkAnswer(correct) {
